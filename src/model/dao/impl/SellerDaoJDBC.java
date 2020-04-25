@@ -69,8 +69,7 @@ public class SellerDaoJDBC implements SellerDao {
 			st = conn.prepareStatement(
 					"UPDATE seller "  
 					+ "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? " 
-					+ "WHERE Id = ?", 
-					Statement.RETURN_GENERATED_KEYS);
+					+ "WHERE Id = ?");
 			st.setString(1, obj.getName());
 			st.setString(2, obj.getEmail());
 			st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
@@ -78,7 +77,11 @@ public class SellerDaoJDBC implements SellerDao {
 			st.setInt(5, obj.getDeparment().getId());
 			st.setInt(6, obj.getId());
 
-			st.executeUpdate();
+			int rows = st.executeUpdate();
+			
+			if (rows == 0) {
+				throw new DbException("Unexpected error! No rows affected!");
+			}
 		} catch (SQLException e) {
 			throw new DbException(e.getMessage());
 		} finally {
@@ -93,8 +96,7 @@ public class SellerDaoJDBC implements SellerDao {
 		try {
 			st = conn.prepareStatement(
 					"DELETE FROM seller "  
-					+ "WHERE Id = ?", 
-					Statement.RETURN_GENERATED_KEYS);
+					+ "WHERE Id = ?");
 			st.setInt(1, id);
 
 			int rows = st.executeUpdate();
