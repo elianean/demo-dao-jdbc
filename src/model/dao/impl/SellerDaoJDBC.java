@@ -88,8 +88,25 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
+		PreparedStatement st = null;
 
+		try {
+			st = conn.prepareStatement(
+					"DELETE FROM seller "  
+					+ "WHERE Id = ?", 
+					Statement.RETURN_GENERATED_KEYS);
+			st.setInt(1, id);
+
+			int rows = st.executeUpdate();
+			
+			if (rows == 0) {
+				throw new DbException("Unexpected error! No rows affected!");
+			}
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
@@ -99,8 +116,10 @@ public class SellerDaoJDBC implements SellerDao {
 
 		try {
 			st = conn.prepareStatement(
-					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
-							+ "ON seller.DepartmentId = department.Id " + "WHERE seller.Id = ?");
+					"SELECT seller.*,department.Name as DepName "
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id " 
+					+ "WHERE seller.Id = ?");
 			st.setInt(1, id);
 			rs = st.executeQuery();
 
@@ -144,8 +163,10 @@ public class SellerDaoJDBC implements SellerDao {
 
 		try {
 			st = conn.prepareStatement(
-					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
-							+ "ON seller.DepartmentId = department.Id " + "ORDER BY Name");
+					"SELECT seller.*,department.Name as DepName " 
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id " 
+					+ "ORDER BY Name");
 			rs = st.executeQuery();
 
 			List<Seller> list = new ArrayList<>();
@@ -179,8 +200,11 @@ public class SellerDaoJDBC implements SellerDao {
 
 		try {
 			st = conn.prepareStatement(
-					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
-							+ "ON seller.DepartmentId = department.Id " + "WHERE DepartmentId = ? " + "ORDER BY Name");
+					"SELECT seller.*,department.Name as DepName " 
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id " 
+					+ "WHERE DepartmentId = ? " 
+					+ "ORDER BY Name");
 			st.setInt(1, department.getId());
 			rs = st.executeQuery();
 
